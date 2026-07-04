@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Research Clipper</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Research Clipper</h1>
+      <p class="muted">Tip: highlight text on the page, then click “Refresh selection”.</p>
+
+      <div class="row">
+        <button id="refreshBtn" class="btn">Refresh selection</button>
+        <button id="openLibraryBtn" class="btn secondary">Open library</button>
+      </div>
+
+      <div class="card">
+        <div class="label">Selection preview</div>
+        <div id="selectionPreview" class="preview">(nothing yet)</div>
+      </div>
+
+      <div class="card">
+        <label class="label" for="tagsInput">Tags (comma-separated)</label>
+        <input id="tagsInput" class="input" placeholder="e.g. pricing, competitor, quote" />
+
+        <label class="label" for="projectInput">Project (optional)</label>
+        <input id="projectInput" class="input" placeholder="e.g. Q3 research" />
+
+        <button id="saveBtn" class="btn primary" disabled>Save clip</button>
+        <div id="status" class="status"></div>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

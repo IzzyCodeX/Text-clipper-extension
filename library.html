@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Research Clipper Library</title>
+    <link rel="stylesheet" href="library.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="header">
+        <div>
+          <h1>Research Library</h1>
+          <p class="muted">All clips are stored locally in your browser (chrome.storage.local).</p>
+        </div>
+        <div class="actions">
+          <button id="copyJsonBtn" class="btn">Copy JSON</button>
+          <button id="copyMdBtn" class="btn">Copy Markdown</button>
+          <button id="clearAllBtn" class="btn danger">Clear all</button>
+        </div>
+      </header>
+
+      <section class="filters">
+        <input id="searchInput" class="input" placeholder="Search clips (text, title, url, tags)…" />
+        <input id="tagInput" class="input" placeholder="Filter by tag (exact)" />
+        <input id="projectInput" class="input" placeholder="Filter by project (exact)" />
+        <button id="refreshBtn" class="btn">Refresh</button>
+      </section>
+
+      <div id="status" class="status"></div>
+
+      <main id="list" class="list"></main>
+
+      <footer class="footer muted">
+        Tip: You can also save clips by highlighting text on a page and right-clicking → “Save selection to Research Clipper”.
+      </footer>
+    </div>
+
+    <script src="library.js"></script>
+  </body>
+</html>
