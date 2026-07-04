@@ -179,5 +179,8 @@ refresh();
 let refreshTimer = null;
 chrome.storage.onChanged.addListener((changes, areaName) => {
  if (areaName !== 'local' ) return ;
- if (!changes.)
+ if (!changes.clips)  return;
+
+ clearTimeout (refreshTimer );
+ refreshTimer= setTimeout(() => refresh(), 150);
 })
