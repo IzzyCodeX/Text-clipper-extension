@@ -1,8 +1,4 @@
-// popup.js
-// - Reads the current page selection (when you click Refresh)
-// - Sends it to background.js to save
-
-let lastSelection = null; // { url, title, selectionText }
+let lastSelection = null; 
 
 function trimPreview(s, max = 400) {
   if (!s) return '';
@@ -13,7 +9,6 @@ async function getSelectionFromPage() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab || !tab.id) throw new Error('No active tab');
 
-  // Inject a tiny function into the page to read selection + title + URL
   const result = await chrome.scripting.executeScript({
     target: { tabId: tab.id },
     func: () => {
@@ -94,9 +89,14 @@ async function saveClip() {
 
   const res = await chrome.runtime.sendMessage({ type: 'SAVE_CLIP', clip });
   if (res && res.ok) {
-    setStatus('Saved! Open Library to view all clips.');
-    // keep selection so the user can save again with different tags if they want
-    setSaveEnabled(true);
+    setStatus('Saved! Now click "Refresh selection" to clip again.');
+    lastSelection = null;
+    setPreview('(saved - refresh selection to clip again)');
+    setSaveEnabled(false);
+
+    document.getElementById('tagsInput').value = '';
+    document.getElementById('projectInput').value= '';
+    return;
   } else {
     setStatus('Save failed: ' + (res && res.error ? res.error : 'Unknown error'));
     setSaveEnabled(true);
@@ -104,13 +104,10 @@ async function saveClip() {
 }
 
 async function openLibrary() {
-  // Opens the options_page (we use it as the library UI)
   await chrome.runtime.openOptionsPage();
 }
 
 document.getElementById('refreshBtn').addEventListener('click', refreshSelection);
 document.getElementById('saveBtn').addEventListener('click', saveClip);
 document.getElementById('openLibraryBtn').addEventListener('click', openLibrary);
-
-// Try an initial refresh so the popup isn't empty
 refreshSelection();
