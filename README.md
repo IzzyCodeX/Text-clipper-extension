@@ -1,20 +1,25 @@
-# Research Clipper (Text Only) — beginner-friendly Chrome extension
+# Text Clipper
 
-This is a simple **Manifest V3** Chrome extension that saves highlighted text into a local library.
+A lightweight Chrome extension built with **Manifest V3** that allows you to save highlighted text from any webpage into a local library. Perfect for researchers, students, and anyone who wants to collect information while browsing
 
-## What it does
-- Highlight text on any page
-- Save it using:
-  - the popup (click the extension icon)
-  - OR right-click → **Save selection to Research Clipper**
-- Open the library (Options page) to search, delete, and export (copy JSON/Markdown)
+## Features
+- Save highlighted text
+- View saved texts in the library
+- Copy or delete entries
+- Persistent local storage
 
-## Install (Developer mode)
-1. Open `chrome://extensions`
-2. Turn on **Developer mode** (top right)
-3. Click **Load unpacked**
-4. Select this folder: `research-clipper-extension/`
+## Install
+1. Go to `chrome://extensions/`
+2. Enable Developer mode
+3. Load unpacked → Select folder
 
-## Notes
-- Data is stored locally via `chrome.storage.local`
-- Screenshot support is intentionally skipped to keep the code easy to learn
+## Tech Stack
+- Manifest V3
+- JavaScript
+- Chrome Storage API
+
+## Author
+IzzyCodeX
+
+## License
+MIT
