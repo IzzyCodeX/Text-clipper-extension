@@ -2,8 +2,12 @@
 // Responsible for:
 // - Context menu: save selection
 // - Saving clips into chrome.storage.local
+// - Dark mode storage
+// - Update clip details
+// - Pin/unpin clips
 
 const STORAGE_KEY = 'clips';
+const THEME_KEY = 'themePreference';
 
 function makeId() {
   return 'clip_' + Date.now() + '_' + Math.random().toString(16).slice(2);
@@ -23,6 +27,15 @@ async function saveClip(clip) {
   clips.unshift(clip);
   await setClips(clips);
   return clip;
+}
+
+async function getTheme() {
+  const data = await chrome.storage.local.get(THEME_KEY);
+  return data[THEME_KEY] || 'light';
+}
+
+async function setTheme(theme) {
+  await chrome.storage.local.set({ [THEME_KEY]: theme });
 }
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -46,12 +59,13 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       title: tab?.title || '',
       selectionText,
       tags: [],
-      project: ''
+      project: '',
+      notes: '',
+      pinned: false
     };
 
     await saveClip(clip);
 
-    // (Optional) show a tiny confirmation badge on the extension icon
     if (chrome.action && chrome.action.setBadgeText) {
       await chrome.action.setBadgeText({ text: '✓', tabId: tab?.id });
       setTimeout(() => chrome.action.setBadgeText({ text: '', tabId: tab?.id }), 1200);
@@ -95,8 +109,53 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return;
       }
 
+      if (message.type === 'UPDATE_CLIP') {
+        const updated = message.clip;
+        if (!updated || !updated.id) {
+          sendResponse({ ok: false, error: 'Missing clip id' });
+          return;
+        }
+        const clips = await getClips();
+        const idx = clips.findIndex(c => c.id === updated.id);
+        if (idx === -1) {
+          sendResponse({ ok: false, error: 'Clip not found' });
+          return;
+        }
+        clips[idx] = { ...clips[idx], ...updated };
+        await setClips(clips);
+        sendResponse({ ok: true, clip: clips[idx] });
+        return;
+      }
+
+      if (message.type === 'TOGGLE_PIN') {
+        const id = message.id;
+        const clips = await getClips();
+        const clip = clips.find(c => c.id === id);
+        if (!clip) {
+          sendResponse({ ok: false, error: 'Clip not found' });
+          return;
+        }
+        clip.pinned = !clip.pinned;
+        await setClips(clips);
+        sendResponse({ ok: true, pinned: clip.pinned });
+        return;
+      }
+
       if (message.type === 'CLEAR_ALL') {
         await setClips([]);
+        sendResponse({ ok: true });
+        return;
+      }
+
+      if (message.type === 'GET_THEME') {
+        const theme = await getTheme();
+        sendResponse({ ok: true, theme });
+        return;
+      }
+
+      if (message.type === 'SET_THEME') {
+        const theme = message.theme || 'light';
+        await setTheme(theme);
         sendResponse({ ok: true });
         return;
       }
@@ -108,6 +167,5 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
   })();
 
-  // Keep the message channel open for async sendResponse
   return true;
 });

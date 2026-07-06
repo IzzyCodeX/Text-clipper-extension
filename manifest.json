@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Research Clipper (Text Only)",
-  "version": "0.1.0",
-  "description": "Save selected text from webpages into a local research library (stored on your device).",
+  "version": "0.2.0",
+  "description": "Save selected text from webpages into a local research library. Features dark mode, tags, notes, pin, sort, and export.",
   "permissions": [
     "storage",
     "contextMenus",
@@ -16,5 +16,21 @@
   "background": {
     "service_worker": "background.js"
   },
-  "options_page": "library.html"
+  "options_page": "library.html",
+  "commands": {
+    "save-clip": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Save current selection to library"
+    },
+    "open-library": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+L",
+        "mac": "Command+Shift+L"
+      },
+      "description": "Open the research library"
+    }
+  }
 }

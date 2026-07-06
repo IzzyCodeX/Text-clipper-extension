@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -10,30 +10,105 @@
     <div class="wrap">
       <header class="header">
         <div>
-          <h1>Research Library</h1>
+          <h1>
+            📚 Research Library
+            <button id="themeToggle" class="theme-toggle" title="Toggle dark mode">🌙</button>
+          </h1>
           <p class="muted">All clips are stored locally in your browser (chrome.storage.local).</p>
         </div>
         <div class="actions">
-          <button id="copyJsonBtn" class="btn">Copy JSON</button>
-          <button id="copyMdBtn" class="btn">Copy Markdown</button>
-          <button id="clearAllBtn" class="btn danger">Clear all</button>
+          <button id="copyJsonBtn" class="btn">📋 Copy JSON</button>
+          <button id="copyMdBtn" class="btn">📝 Copy Markdown</button>
+          <button id="exportPdfBtn" class="btn">📄 Export PDF</button>
+          <button id="importJsonBtn" class="btn">📥 Import JSON</button>
+          <button id="clearAllBtn" class="btn danger">🗑️ Clear all</button>
         </div>
       </header>
 
       <section class="filters">
-        <input id="searchInput" class="input" placeholder="Search clips (text, title, url, tags)…" />
+        <input id="searchInput" class="input" placeholder="🔍 Search clips (text, title, url, tags)…" />
         <input id="tagInput" class="input" placeholder="Filter by tag (exact)" />
         <input id="projectInput" class="input" placeholder="Filter by project (exact)" />
-        <button id="refreshBtn" class="btn">Refresh</button>
+        <button id="refreshBtn" class="btn">🔄 Refresh</button>
       </section>
+
+      <div class="sort-bar">
+        <label for="sortField">Sort by:</label>
+        <select id="sortField">
+          <option value="date-desc">Date (newest first)</option>
+          <option value="date-asc">Date (oldest first)</option>
+          <option value="title-asc">Title (A→Z)</option>
+          <option value="title-desc">Title (Z→A)</option>
+          <option value="project-asc">Project (A→Z)</option>
+          <option value="project-desc">Project (Z→A)</option>
+        </select>
+        <label style="margin-left: 12px;">
+          <input type="checkbox" id="pinnedFirst" checked /> Pinned first
+        </label>
+      </div>
 
       <div id="status" class="status"></div>
 
       <main id="list" class="list"></main>
 
       <footer class="footer muted">
-        Tip: You can also save clips by highlighting text on a page and right-clicking → “Save selection to Research Clipper”.
+        <div class="shortcut-help">
+          <span><kbd>Ctrl</kbd>+<kbd>F</kbd> Focus search</span>
+          <span><kbd>Ctrl</kbd>+<kbd>N</kbd> New clip</span>
+          <span><kbd>?</kbd> Help</span>
+        </div>
+        <p>Tip: You can also save clips by highlighting text on a page and right-clicking → "Save selection to Research Clipper".</p>
       </footer>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal-overlay" style="display: none;">
+      <div class="modal">
+        <h2>✏️ Edit Clip</h2>
+        <input type="hidden" id="editClipId" />
+        <div class="form-group">
+          <label for="editTitle">Title</label>
+          <input id="editTitle" class="input" />
+        </div>
+        <div class="form-group">
+          <label for="editText">Text</label>
+          <textarea id="editText" class="textarea"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="editTags">Tags (comma-separated)</label>
+          <input id="editTags" class="input" />
+        </div>
+        <div class="form-group">
+          <label for="editProject">Project</label>
+          <input id="editProject" class="input" />
+        </div>
+        <div class="form-group">
+          <label for="editNotes">Notes</label>
+          <textarea id="editNotes" class="textarea"></textarea>
+        </div>
+        <div class="btn-row">
+          <button id="editCancelBtn" class="btn">Cancel</button>
+          <button id="editSaveBtn" class="btn primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="importModal" class="modal-overlay" style="display: none;">
+      <div class="modal">
+        <h2>📥 Import Clips from JSON</h2>
+        <p class="muted">Paste your JSON array of clips below, or select a .json file.</p>
+        <div class="form-group">
+          <textarea id="importTextarea" class="textarea" rows="10" placeholder='[{"selectionText": "...", "url": "...", "title": "..."}]'></textarea>
+        </div>
+        <div class="form-group">
+          <input type="file" id="importFileInput" accept=".json" />
+        </div>
+        <div class="btn-row">
+          <button id="importCancelBtn" class="btn">Cancel</button>
+          <button id="importConfirmBtn" class="btn primary">Import</button>
+        </div>
+      </div>
     </div>
 
     <script src="library.js"></script>

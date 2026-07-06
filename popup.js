@@ -1,5 +1,33 @@
-let lastSelection = null; 
+let lastSelection = null;
 
+// ─── Dark Mode ───
+async function loadTheme() {
+  try {
+    const res = await chrome.runtime.sendMessage({ type: 'GET_THEME' });
+    if (res && res.ok && res.theme) {
+      document.documentElement.setAttribute('data-theme', res.theme);
+      updateThemeIcon(res.theme);
+    }
+  } catch {
+    // default to light
+  }
+}
+
+function updateThemeIcon(theme) {
+  const btn = document.getElementById('themeToggle');
+  btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  btn.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+}
+
+async function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  updateThemeIcon(next);
+  await chrome.runtime.sendMessage({ type: 'SET_THEME', theme: next });
+}
+
+// ─── Helpers ───
 function trimPreview(s, max = 400) {
   if (!s) return '';
   return s.length > max ? s.slice(0, max) + '…' : s;
@@ -45,6 +73,7 @@ function setSaveEnabled(enabled) {
   document.getElementById('saveBtn').disabled = !enabled;
 }
 
+// ─── Core Actions ───
 async function refreshSelection() {
   setStatus('Reading selection…');
   setSaveEnabled(false);
@@ -73,6 +102,7 @@ async function saveClip() {
 
   const tags = parseTags(document.getElementById('tagsInput').value);
   const project = (document.getElementById('projectInput').value || '').trim();
+  const notes = (document.getElementById('notesInput').value || '').trim();
 
   const clip = {
     id: 'clip_' + Date.now() + '_' + Math.random().toString(16).slice(2),
@@ -81,7 +111,9 @@ async function saveClip() {
     title: lastSelection.title,
     selectionText: lastSelection.selectionText,
     tags,
-    project
+    project,
+    notes,
+    pinned: false
   };
 
   setStatus('Saving…');
@@ -89,13 +121,14 @@ async function saveClip() {
 
   const res = await chrome.runtime.sendMessage({ type: 'SAVE_CLIP', clip });
   if (res && res.ok) {
-    setStatus('Saved! Now click "Refresh selection" to clip again.');
+    setStatus('✅ Saved! Click "Refresh selection" to clip again.');
     lastSelection = null;
-    setPreview('(saved - refresh selection to clip again)');
+    setPreview('(saved — refresh selection to clip again)');
     setSaveEnabled(false);
 
     document.getElementById('tagsInput').value = '';
-    document.getElementById('projectInput').value= '';
+    document.getElementById('projectInput').value = '';
+    document.getElementById('notesInput').value = '';
     return;
   } else {
     setStatus('Save failed: ' + (res && res.error ? res.error : 'Unknown error'));
@@ -107,7 +140,29 @@ async function openLibrary() {
   await chrome.runtime.openOptionsPage();
 }
 
+// ─── Event Listeners ───
 document.getElementById('refreshBtn').addEventListener('click', refreshSelection);
 document.getElementById('saveBtn').addEventListener('click', saveClip);
 document.getElementById('openLibraryBtn').addEventListener('click', openLibrary);
+document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  // Ctrl+S or Cmd+S to save
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    if (!document.getElementById('saveBtn').disabled) {
+      saveClip();
+    }
+  }
+
+  // Ctrl+R or Cmd+R to refresh (override default reload)
+  if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+    e.preventDefault();
+    refreshSelection();
+  }
+});
+
+// Initialize
+loadTheme();
 refreshSelection();

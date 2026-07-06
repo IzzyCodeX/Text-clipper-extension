@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,12 +8,15 @@
   </head>
   <body>
     <div class="wrap">
-      <h1>Research Clipper</h1>
-      <p class="muted">Tip: highlight text on the page, then click “Refresh selection”.</p>
+      <h1>
+        📋 Research Clipper
+        <button id="themeToggle" class="theme-toggle" title="Toggle dark mode">🌙</button>
+      </h1>
+      <p class="muted">Tip: highlight text on the page, then click "Refresh selection".</p>
 
       <div class="row">
-        <button id="refreshBtn" class="btn">Refresh selection</button>
-        <button id="openLibraryBtn" class="btn secondary">Open library</button>
+        <button id="refreshBtn" class="btn">🔄 Refresh selection</button>
+        <button id="openLibraryBtn" class="btn secondary">📚 Open library</button>
       </div>
 
       <div class="card">
@@ -28,7 +31,11 @@
         <label class="label" for="projectInput">Project (optional)</label>
         <input id="projectInput" class="input" placeholder="e.g. Q3 research" />
 
-        <button id="saveBtn" class="btn primary" disabled>Save clip</button>
+        <label class="label" for="notesInput">Notes (optional)</label>
+        <textarea id="notesInput" class="textarea" placeholder="Add your thoughts or context about this clip..."></textarea>
+
+        <button id="saveBtn" class="btn primary" disabled>💾 Save clip</button>
+        <div class="shortcut-hint">Press <kbd>Ctrl</kbd>+<kbd>S</kbd> to save</div>
         <div id="status" class="status"></div>
       </div>
     </div>
